@@ -1,4 +1,4 @@
-import { CartItem, CustomerData, DeliveryFeeMap } from './types';
+import { CartItem, CustomerData } from './types';
 import { DELIVERY_FEES, OPENING_HOUR, OPENING_MINUTE, CLOSING_HOUR, CLOSING_MINUTE } from './constants';
 
 export const formatCurrency = (value: number) => {

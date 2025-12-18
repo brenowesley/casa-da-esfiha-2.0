@@ -77,8 +77,10 @@ const App: React.FC = () => {
     // Remove from cart if becomes unavailable
     setCart(prev => prev.filter(item => {
       if (item.id === id) {
-        const prod = products.find(p => p.id === id);
-        return true; 
+        if (!products.find(p => p.id === id)?.available) {
+          return false;
+        }
+        return true;
       }
       return true;
     }));
