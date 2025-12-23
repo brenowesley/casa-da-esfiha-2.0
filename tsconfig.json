@@ -16,6 +16,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
+<<<<<<< HEAD
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/lib/supabase.ts"],
+=======
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+>>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
   "exclude": ["node_modules"]
 }

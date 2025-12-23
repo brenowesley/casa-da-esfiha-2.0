@@ -1,7 +1,13 @@
+<<<<<<< HEAD
+=======
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+>>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
 @layer base {
   body {
     @apply bg-brand-cream text-brand-dark antialiased;
@@ -27,4 +33,24 @@
   .btn-category-inactive {
     @apply text-brand-dark/40 hover:bg-brand-yellow/10 hover:text-brand-dark;
   }
+=======
+/* Smooth scrolling */
+html { 
+  scroll-behavior: smooth; 
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { 
+  width: 6px; 
+}
+::-webkit-scrollbar-track { 
+  background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb { 
+  background: #d32f2f; 
+  border-radius: 3px; 
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: #b71c1c; 
+>>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 }
