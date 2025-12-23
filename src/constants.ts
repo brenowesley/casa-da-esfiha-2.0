@@ -1,24 +1,11 @@
 import { Category, Product, DeliveryFeeMap } from './types';
 
-<<<<<<< HEAD
-/**
- * CONFIGURAÇÕES DE ACESSO DO GERENTE
- * Altere os valores abaixo para definir seu usuário e senha de acesso.
- */
-export const MANAGER_CREDENTIALS = {
-  username: 'admin', // Altere aqui seu nome de usuário
-  password: '123'    // Altere aqui sua senha de acesso
-};
-
-// Horários de Funcionamento
-=======
 // CREDENCIAIS DO GERENTE
 export const MANAGER_CREDENTIALS = {
   username: 'admin',
   password: '123456' 
 };
 
->>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 export const OPENING_HOUR = 17;
 export const OPENING_MINUTE = 30;
 export const CLOSING_HOUR = 22;

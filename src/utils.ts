@@ -9,13 +9,10 @@ export const normalizeText = (text: string): string => {
   return text.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 };
 
-<<<<<<< HEAD
 export const generateId = () => {
   return Math.random().toString(36).substring(2, 9);
 };
 
-=======
->>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 export const getDeliveryFee = (bairro: string): number => {
   const normalized = normalizeText(bairro);
   return DELIVERY_FEES[normalized] || 0;

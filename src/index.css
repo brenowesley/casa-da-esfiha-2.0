@@ -1,39 +1,7 @@
-<<<<<<< HEAD
-=======
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
->>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
-@layer base {
-  body {
-    @apply bg-brand-cream text-brand-dark antialiased;
-  }
-}
-
-@layer components {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  .glass-header {
-    @apply sticky top-4 z-40 p-1.5 bg-white/80 backdrop-blur-md border border-white shadow-premium rounded-2xl;
-  }
-
-  .btn-category {
-    @apply flex-none px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-300;
-  }
-  
-  .btn-category-active {
-    @apply bg-brand-orange text-white shadow-floating scale-105;
-  }
-
-  .btn-category-inactive {
-    @apply text-brand-dark/40 hover:bg-brand-yellow/10 hover:text-brand-dark;
-  }
-=======
 /* Smooth scrolling */
 html { 
   scroll-behavior: smooth; 
@@ -52,5 +20,4 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover { 
   background: #b71c1c; 
->>>>>>> f89f84f67b0cc1ab83112c742b0c62d37fea6a95
 }
