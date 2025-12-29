@@ -50,14 +50,15 @@ const App: React.FC = () => {
     }
   };
 
-  const fetchStoreConfig = async () => {
+const fetchStoreConfig = async () => {
     if (!isSupabaseConfigured) return;
     try {
       const { data } = await supabase.from('store_config').select('*');
       if (data) {
         setStoreConfig({
-          delivery: data.find(i => i.id === 'delivery')?.status ?? true,
-          pickup: data.find(i => i.id === 'pickup')?.status ?? true,
+          // Adicionamos a tipagem (i: any) ou melhor (i: { id: string; status: boolean })
+          delivery: data.find((i: any) => i.id === 'delivery')?.status ?? true,
+          pickup: data.find((i: any) => i.id === 'pickup')?.status ?? true,
         });
       }
     } catch (err) {
