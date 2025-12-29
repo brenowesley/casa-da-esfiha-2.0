@@ -3,14 +3,13 @@ import { Product, Category } from '../types';
 import { formatCurrency, generateId } from '../utils';
 import { 
   ArrowLeft, CheckCircle, XCircle, Plus, 
-  Trash2, List, Save, Lock, Loader2, LogOut,
-  Truck, Store, ShieldCheck, ShoppingBag
-} from 'lucide-react';
+  Trash2, List, Save, Lock, Loader2, LogOut, Truck, Store
+} from 'lucide-react'; 
 
 interface ManagerDashboardProps {
   products: Product[];
-  storeConfig: { delivery: boolean, pickup: boolean }; // Adicionado
-  onUpdateStoreConfig: (type: 'delivery' | 'pickup', currentStatus: boolean) => Promise<void>; // Adicionado
+  storeConfig: { delivery: boolean, pickup: boolean };
+  onUpdateStoreConfig: (type: 'delivery' | 'pickup', currentStatus: boolean) => Promise<void>;
   onToggleAvailability: (id: string) => Promise<void>;
   onAddProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
