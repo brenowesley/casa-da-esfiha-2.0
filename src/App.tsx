@@ -26,6 +26,8 @@ const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(checkStoreOpen());
+  const [storeConfig, setStoreConfig] = useState({ delivery: true, pickup: true });
+  
   const [_, setManagerPassword] = useState<string>(() => 
     localStorage.getItem('manager_password') || MANAGER_CREDENTIALS.password
   );
@@ -34,6 +36,7 @@ const App: React.FC = () => {
   const { cart, handleUpdateQuantity, totalItems, formattedSubtotal, isEmpty, subtotal } = useCart(products);
 
   // --- 1. Sincronização com Supabase (Realtime) ---
+  
   const fetchProducts = async () => {
     try {
       if (!isSupabaseConfigured) return setProducts(MENU_ITEMS);
@@ -41,78 +44,86 @@ const App: React.FC = () => {
       if (error) throw error;
       setProducts(data?.length ? data : MENU_ITEMS);
     } catch (err) {
-      console.error("Erro ao carregar cardápio:", err);
       setProducts(MENU_ITEMS);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchStoreConfig = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data } = await supabase.from('store_config').select('*');
+      if (data) {
+        setStoreConfig({
+          delivery: data.find(i => i.id === 'delivery')?.status ?? true,
+          pickup: data.find(i => i.id === 'pickup')?.status ?? true,
+        });
+      }
+    } catch (err) {
+      console.error("Erro ao carregar travas da loja");
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchStoreConfig();
     
     const timer = setInterval(() => setIsStoreOpen(checkStoreOpen()), 60000);
 
     if (isSupabaseConfigured) {
-      const channel = supabase.channel('db_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-          // Atualiza o cardápio silenciosamente quando houver mudanças no banco
-          fetchProducts(); 
-        })
+      // Ouve mudanças nos Produtos
+      const prodChannel = supabase.channel('products_realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchProducts())
         .subscribe();
-      return () => { supabase.removeChannel(channel); clearInterval(timer); };
+
+      // Ouve mudanças no Delivery/Retirada (Realtime)
+      const configChannel = supabase.channel('config_realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'store_config' }, () => fetchStoreConfig())
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(prodChannel);
+        supabase.removeChannel(configChannel);
+        clearInterval(timer);
+      };
     }
     return () => clearInterval(timer);
   }, []);
 
-  // --- 2. Handlers de Gestão (Com Atualização Otimista) ---
+  // --- 2. Handlers de Gestão ---
+
   const handleToggleAvailability = async (id: string) => {
     const product = products.find(p => p.id === id);
     if (!product) return;
-
     const newStatus = !product.available;
 
-    // ATUALIZAÇÃO OTIMISTA: Muda na tela antes de ir pro banco (UX Premium)
+    // Otimista
     setProducts(prev => prev.map(p => p.id === id ? { ...p, available: newStatus } : p));
 
-    try {
-      if (isSupabaseConfigured) {
-        const { error } = await supabase
-          .from('products')
-          .update({ available: newStatus })
-          .eq('id', id);
-        
-        if (error) throw error;
-      }
-    } catch (err) {
-      console.error("Erro ao salvar disponibilidade:", err);
-      fetchProducts(); // Reverte para o estado real do banco caso falhe
-      alert("O Gênio não conseguiu salvar a alteração. Verifique sua conexão.");
+    if (isSupabaseConfigured) {
+      await supabase.from('products').update({ available: newStatus }).eq('id', id);
+    }
+  };
+
+  const handleUpdateStoreConfig = async (type: 'delivery' | 'pickup', currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+    // Otimista
+    setStoreConfig(prev => ({ ...prev, [type]: newStatus }));
+
+    if (isSupabaseConfigured) {
+      await supabase.from('store_config').update({ status: newStatus }).eq('id', type);
     }
   };
 
   const handleAddProduct = async (product: Product) => {
-    try {
-      if (isSupabaseConfigured) {
-        const { error } = await supabase.from('products').insert([product]);
-        if (error) throw error;
-      }
-      fetchProducts();
-    } catch (err) {
-      alert("Erro ao adicionar produto.");
-    }
+    if (isSupabaseConfigured) await supabase.from('products').insert([product]);
+    fetchProducts();
   };
 
   const handleDeleteProduct = async (id: string) => {
-    try {
-      if (isSupabaseConfigured) {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-      }
-      fetchProducts();
-    } catch (err) {
-      alert("Erro ao excluir produto.");
-    }
+    if (isSupabaseConfigured) await supabase.from('products').delete().eq('id', id);
+    fetchProducts();
   };
 
   // --- 3. UI Helpers ---
@@ -131,11 +142,15 @@ const App: React.FC = () => {
   }, [products]);
 
   // --- Renderização de Telas ---
-  if (view === 'CHECKOUT') return <Checkout cart={cart} subtotal={subtotal} onBack={() => setView('MENU')} isStoreOpen={isStoreOpen} />;
+  if (view === 'CHECKOUT') return <Checkout cart={cart} subtotal={subtotal} onBack={() => setView('MENU')} isStoreOpen={isStoreOpen} storeConfig={storeConfig} />;
+  
   if (view === 'MANAGER_LOGIN') return <ManagerLogin onLoginSuccess={() => setView('MANAGER_DASHBOARD')} onBack={() => setView('MENU')} />;
+  
   if (view === 'MANAGER_DASHBOARD') return (
     <ManagerDashboard 
       products={products} 
+      storeConfig={storeConfig}
+      onUpdateStoreConfig={handleUpdateStoreConfig}
       onToggleAvailability={handleToggleAvailability}
       onAddProduct={handleAddProduct}
       onDeleteProduct={handleDeleteProduct}
@@ -146,10 +161,10 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-cream selection:bg-brand-orange/20">
+    <div className="min-h-screen flex flex-col bg-brand-cream">
       
       {/* HEADER PREMIUM */}
-      <header className="relative h-[480px] md:h-[520px] w-full flex flex-col items-center justify-center bg-brand-dark overflow-hidden">
+      <header className="relative h-[450px] md:h-[500px] w-full flex flex-col items-center justify-center bg-brand-dark overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-orange via-brand-yellow to-brand-orange opacity-95"></div>
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
         
@@ -157,14 +172,10 @@ const App: React.FC = () => {
           <div className="w-64 h-64 md:w-80 md:h-80 mb-2 flex items-center justify-center transition-transform hover:scale-105 duration-700">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.3)]" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-black text-brand-dark tracking-tighter">
+          <h1 className="text-5xl md:text-7xl font-serif font-black text-brand-dark tracking-tighter leading-none">
             Casa da <span className="text-white italic drop-shadow-md">Esfirra</span>
           </h1>
-          <div className="flex items-center justify-center gap-3 mt-2">
-             <span className="h-px w-6 bg-brand-dark/20"></span>
-             <p className="text-brand-dark/70 font-bold uppercase tracking-[0.4em] text-[10px]">Tradição & Sabor • Itabuna</p>
-             <span className="h-px w-6 bg-brand-dark/20"></span>
-          </div>
+          <p className="text-brand-dark/60 font-bold uppercase tracking-[0.4em] text-[10px] mt-3">Tradição & Sabor • Itabuna</p>
         </motion.div>
 
         <div className="absolute bottom-0 left-0 w-full h-16 bg-brand-cream rounded-t-[4rem]"></div>
@@ -198,7 +209,7 @@ const App: React.FC = () => {
               items && items.length > 0 && (
                 <section key={category} ref={(el) => { categoryRefs.current[category] = el; }} className="scroll-mt-28">
                   <div className="flex items-center gap-4 mb-8">
-                    <div className="w-10 h-10 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange">
+                    <div className="w-10 h-10 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange shadow-sm">
                       <Star size={18} fill="currentColor" />
                     </div>
                     <h2 className="text-2xl font-serif font-black text-brand-dark">{category}</h2>
@@ -238,9 +249,9 @@ const App: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <div className="text-left">
-                  <p className="text-[10px] text-white/40 font-black uppercase tracking-widest leading-none mb-1">Seu Pedido</p>
-                  <p className="text-2xl font-black tracking-tighter leading-none">{formattedSubtotal}</p>
+                <div className="text-left leading-none">
+                  <p className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1">Seu Pedido</p>
+                  <p className="text-2xl font-black tracking-tighter">{formattedSubtotal}</p>
                 </div>
               </div>
               <div className="bg-brand-yellow text-brand-dark h-14 px-8 rounded-2xl flex items-center font-black text-xs uppercase tracking-widest group-hover:bg-white transition-colors">
@@ -256,13 +267,10 @@ const App: React.FC = () => {
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
         
         <div className="relative z-10 max-w-xs mx-auto space-y-8">
-          <a href="https://instagram.com/casadaesfihaitabuna" target="_blank" rel="noreferrer" className="inline-block p-4 rounded-full bg-brand-dark/5 hover:bg-brand-dark/10 transition-all text-brand-dark">
+          <a href="https://instagram.com" target="_blank" rel="noreferrer" className="inline-block p-4 rounded-full bg-brand-dark/5 hover:bg-brand-dark/10 transition-all text-brand-dark">
             <Instagram size={32} />
           </a>
-          <div className="space-y-2">
-            <p className="text-[11px] font-black uppercase tracking-[0.5em] text-brand-dark">CASA DA ESFIRRA • ITABUNA</p>
-            <p className="text-[9px] font-bold text-brand-dark/40 uppercase tracking-widest">Sabor que conquista desde o primeiro pedaço</p>
-          </div>
+          <p className="text-[11px] font-black uppercase tracking-[0.5em] text-brand-dark">CASA DA ESFIRRA • ITABUNA</p>
           <button onClick={() => setView('MANAGER_LOGIN')} className="p-4 hover:text-white transition-colors text-brand-dark/20 mx-auto block">
             <Lock size={14} />
           </button>
