@@ -51,20 +51,16 @@ const App: React.FC = () => {
   };
 
 const fetchStoreConfig = async () => {
-    if (!isSupabaseConfigured) return;
-    try {
-      const { data } = await supabase.from('store_config').select('*');
-      if (data) {
-        setStoreConfig({
-          // Adicionamos a tipagem (i: any) ou melhor (i: { id: string; status: boolean })
-          delivery: data.find((i: any) => i.id === 'delivery')?.status ?? true,
-          pickup: data.find((i: any) => i.id === 'pickup')?.status ?? true,
-        });
-      }
-    } catch (err) {
-      console.error("Erro ao carregar travas da loja");
-    }
-  };
+  if (!isSupabaseConfigured) return;
+  const { data } = await supabase.from('store_config').select('*');
+  if (data) {
+    setStoreConfig({
+      // PRECISA SER .status (exatamente como no banco)
+      delivery: data.find((i: any) => i.id === 'delivery')?.status ?? true,
+      pickup: data.find((i: any) => i.id === 'pickup')?.status ?? true,
+    });
+  }
+};
 
   useEffect(() => {
     fetchProducts();
