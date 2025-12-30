@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Tenta ler com VITE_ (local/manual) ou sem VITE_ (integração automática Vercel)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env?.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env?.SUPABASE_ANON_KEY;
 
-// Log Senior para debug (isso vai aparecer no console do Vercel)
-console.log("Tentando conectar ao Supabase...");
-if (!supabaseUrl) console.error("ERRO: VITE_SUPABASE_URL não encontrada!");
-if (!supabaseAnonKey) console.error("ERRO: VITE_SUPABASE_ANON_KEY não encontrada!");
+// Log de debug para você ver no console se funcionou
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("🚨 ERRO DE CONEXÃO: As chaves do Supabase não foram encontradas. Verifique o prefixo VITE_ no painel da Vercel.");
+} else {
+  console.log("✅ Conexão com Supabase configurada com sucesso!");
+}
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
