@@ -48,7 +48,8 @@ const App: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }; 
+  
 
 const fetchStoreConfig = async () => {
   if (!isSupabaseConfigured) return;
