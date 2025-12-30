@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Busca as variáveis, se não existirem, usa uma string vazia para não quebrar o sistema
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Verificação Senior: Só tenta criar o cliente se as chaves existirem
-export const isSupabaseConfigured = supabaseUrl !== '' && supabaseAnonKey !== '';
+// Log Senior para debug (isso vai aparecer no console do Vercel)
+console.log("Tentando conectar ao Supabase...");
+if (!supabaseUrl) console.error("ERRO: VITE_SUPABASE_URL não encontrada!");
+if (!supabaseAnonKey) console.error("ERRO: VITE_SUPABASE_ANON_KEY não encontrada!");
 
-// Inicializa o cliente (Se estiver vazio, o app usará os dados locais MENU_ITEMS sem crashar)
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+
 export const supabase = isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null as any;
