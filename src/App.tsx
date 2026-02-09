@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(checkStoreOpen());
-  const [storeConfig, setStoreConfig] = useState({ delivery: true, pickup: true });
+  const [storeConfig, setStoreConfig] = useState({ store_open: true, delivery: true, pickup: true });
   
   const [_, setManagerPassword] = useState<string>(() => 
     localStorage.getItem('manager_password') || MANAGER_CREDENTIALS.password
@@ -57,6 +57,7 @@ const fetchStoreConfig = async () => {
   if (data) {
     setStoreConfig({
       // PRECISA SER .status (exatamente como no banco)
+      store_open: data.find((i: any) => i.id === 'store_open')?.status ?? true,
       delivery: data.find((i: any) => i.id === 'delivery')?.status ?? true,
       pickup: data.find((i: any) => i.id === 'pickup')?.status ?? true,
     });

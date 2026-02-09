@@ -8,7 +8,9 @@ import {
 
 interface ManagerDashboardProps {
   products: Product[];
-  storeConfig: { delivery: boolean, pickup: boolean };
+  storeConfig: {
+    store_open: any; delivery: boolean, pickup: boolean 
+};
   onUpdateStoreConfig: (type: 'delivery' | 'pickup', currentStatus: boolean) => Promise<void>;
   onToggleAvailability: (id: string) => Promise<void>;
   onAddProduct: (product: Product) => void;
@@ -142,6 +144,39 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                   </div>
                   {storeConfig.delivery ? <CheckCircle size={24} /> : <XCircle size={24} />}
                 </button>
+
+                {/* Botão Loja Aberta / Fechada */}
+<button
+  disabled={loadingConfig === 'store_open'}
+  onClick={() =>
+    handleUpdateConfig('store_open' as any, storeConfig.store_open)
+  }
+  className={`p-6 rounded-[2.5rem] flex items-center justify-between border-2 transition-all active:scale-95 ${
+    storeConfig.store_open
+      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+      : 'bg-red-50 border-red-200 text-red-700'
+  }`}
+>   
+
+    {/* botão Loja Aberta / Fechada */}
+  <div className="flex items-center gap-4">
+    <div
+      className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${
+        storeConfig.store_open ? 'bg-emerald-500' : 'bg-red-500'
+      } text-white`}
+    >
+      🏪
+    </div>
+    <div className="text-left leading-tight">
+      <p className="font-black text-xs uppercase tracking-widest">
+        Loja
+      </p>
+      <p className="text-[10px] font-bold opacity-60 uppercase">
+        {storeConfig.store_open ? 'Aberta' : 'Fechada'}
+      </p>
+    </div>
+  </div>
+</button>
 
                 {/* Botão Retirada */}
                 <button 

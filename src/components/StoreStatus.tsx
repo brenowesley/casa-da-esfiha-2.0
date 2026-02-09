@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react';
-import { Clock, AlertCircle, CheckCircle2, Moon } from 'lucide-react';
-import { OPENING_HOUR, OPENING_MINUTE, CLOSING_HOUR, CLOSING_MINUTE } from '../constants';
+import React from 'react';
+import { AlertCircle, CheckCircle2, Moon } from 'lucide-react';
 
 interface StoreStatusProps {
   isOpen: boolean;
@@ -11,14 +10,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
   const today = new Date().getDay(); 
   const isMonday = today === 1;
 
-  // 2. Memoização para performance (evita re-processar strings em cada render)
-  const times = useMemo(() => {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return {
-      open: `${pad(OPENING_HOUR)}:${pad(OPENING_MINUTE)}`,
-      close: `${pad(CLOSING_HOUR)}:${pad(CLOSING_MINUTE)}`
-    };
-  }, []);
+
 
   return (
     <div className={`
@@ -42,7 +34,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
             </div>
           )}
 
-          <div className="text-center sm:text-left">
+     {/*     <div className="text-center sm:text-left">
             <p className={`text-sm font-black uppercase tracking-widest ${isOpen ? 'text-emerald-600' : 'text-brand-dark/40'}`}>
               {isOpen ? 'Estamos Abertos!' : 'Loja Fechada'}
             </p>
@@ -53,11 +45,11 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
                   ? 'Segunda é dia de descanso do Gênio' 
                   : `Reabriremos hoje às ${times.open}h`}
             </p>
-          </div>
+          </div>*/}
         </div>
 
         {/* Lado Direito: Badge de Horário */}
-        <div className={`
+      {/*   <div className={`
           flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-tighter border
           ${isOpen 
             ? 'bg-white/60 border-emerald-200 text-emerald-700' 
@@ -65,7 +57,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
         `}>
           <Clock size={12} strokeWidth={3} />
           {isMonday ? 'Ter a Dom' : `${times.open} às ${times.close}`}
-        </div>
+        </div>*/}
 
       </div>
 
