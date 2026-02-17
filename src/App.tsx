@@ -1,40 +1,65 @@
 /// <reference types="vite/client" />
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Category, Product } from './types';
-import { MANAGER_CREDENTIALS, MENU_ITEMS } from './constants';
-import { checkStoreOpen } from './utils';
-import { useCart } from './hooks/useCart';
-import { supabase, isSupabaseConfigured } from './lib/supabase';
+
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { Category, Product } from "./types";
+import { MANAGER_CREDENTIALS, MENU_ITEMS } from "./constants";
+import { checkStoreOpen } from "./utils";
+import { useCart } from "./hooks/useCart";
+import { supabase, isSupabaseConfigured } from "./lib/supabase";
 
 // Components
-import MenuItem from './components/MenuItem';
-import Checkout from './components/Checkout';
-import StoreStatus from './components/StoreStatus';
-import ManagerLogin from './components/ManagerLogin';
-import ManagerDashboard from './components/ManagerDashboard';
+import MenuItem from "./components/MenuItem";
+import Checkout from "./components/Checkout";
+import StoreStatus from "./components/StoreStatus";
+import ManagerLogin from "./components/ManagerLogin";
+import ManagerDashboard from "./components/ManagerDashboard";
 
 // Icons
-import { Loader2 } from 'lucide-react';
+import { Loader2, Instagram, Lock } from "lucide-react";
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'MENU' | 'CHECKOUT' | 'MANAGER_LOGIN' | 'MANAGER_DASHBOARD'>('MENU');
+  const [view, setView] = useState<
+    "MENU" | "CHECKOUT" | "MANAGER_LOGIN" | "MANAGER_DASHBOARD"
+  >("MENU");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(checkStoreOpen());
+
   const [storeConfig, setStoreConfig] = useState({
     store_open: true,
     delivery: true,
-    pickup: true,
+    pickup: true
   });
 
-  const [_, setManagerPassword] = useState<string>(() =>
-    localStorage.getItem('manager_password') || MANAGER_CREDENTIALS.password
+  const [, setManagerPassword] = useState<string>(() =>
+    localStorage.getItem("manager_password") ||
+    MANAGER_CREDENTIALS.password
   );
 
-  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const categoryRefs = useRef<
+    Partial<Record<Category, HTMLElement | null>>
+  >({});
 
-  const { cart, handleUpdateQuantity, subtotal } = useCart(products);
+  const { cart, handleUpdateQuantity, subtotal } =
+    useCart(products);
+
+  const totalItems = cart.reduce(
+    (sum, i) => sum + i.quantity,
+    0
+  );
+
+  const isEmpty = totalItems === 0;
+
+  const formattedSubtotal = subtotal.toLocaleString(
+    "pt-BR",
+    {
+      style: "currency",
+      currency: "BRL"
+    }
+  );
 
   // =============================
   // FETCH PRODUCTS
@@ -47,15 +72,19 @@ const App: React.FC = () => {
       }
 
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('name');
+        .from("products")
+        .select("*")
+        .order("name");
 
       if (error) throw error;
 
-      setProducts(Array.isArray(data) && data.length > 0 ? data : MENU_ITEMS);
+      setProducts(
+        Array.isArray(data) && data.length > 0
+          ? data
+          : MENU_ITEMS
+      );
     } catch (err) {
-      console.error('Erro ao buscar produtos:', err);
+      console.error("Erro ao buscar produtos:", err);
       setProducts(MENU_ITEMS);
     } finally {
       setLoading(false);
@@ -63,34 +92,103 @@ const App: React.FC = () => {
   };
 
   // =============================
-  // FETCH STORE CONFIG
+  // STORE CONFIG
   // =============================
   const fetchStoreConfig = async () => {
     if (!isSupabaseConfigured || !supabase) return;
 
-    const { data, error } = await supabase
-      .from('store_config')
-      .select('*');
-
-    if (error) {
-      console.error('Erro ao buscar store_config:', error);
-      return;
-    }
+    const { data } =
+      await supabase.from("store_config").select("*");
 
     if (!Array.isArray(data)) return;
 
-    const getStatus = (id: string, fallback = true) =>
-      data.find((i: any) => i.id === id)?.status ?? fallback;
+    const getStatus = (
+      id: string,
+      fallback = true
+    ) =>
+      data.find((i: any) => i.id === id)
+        ?.status ?? fallback;
 
     setStoreConfig({
-      store_open: getStatus('store_open'),
-      delivery: getStatus('delivery'),
-      pickup: getStatus('pickup'),
+      store_open: getStatus("store_open"),
+      delivery: getStatus("delivery"),
+      pickup: getStatus("pickup")
     });
   };
 
   // =============================
-  // REALTIME + EFFECT
+  // DASHBOARD HANDLERS
+  // =============================
+  const handleToggleAvailability = async (
+    id: string
+  ) => {
+    const product = products.find(
+      p => p.id === id
+    );
+    if (!product) return;
+
+    const newStatus = !product.available;
+
+    setProducts(prev =>
+      prev.map(p =>
+        p.id === id
+          ? { ...p, available: newStatus }
+          : p
+      )
+    );
+
+    if (isSupabaseConfigured && supabase) {
+      await supabase
+        .from("products")
+        .update({ available: newStatus })
+        .eq("id", id);
+    }
+  };
+
+  const handleUpdateStoreConfig = async (
+    type: "delivery" | "pickup",
+    currentStatus: boolean
+  ) => {
+    const newStatus = !currentStatus;
+
+    setStoreConfig(prev => ({
+      ...prev,
+      [type]: newStatus
+    }));
+
+    if (isSupabaseConfigured && supabase) {
+      await supabase
+        .from("store_config")
+        .update({ status: newStatus })
+        .eq("id", type);
+    }
+  };
+
+  const handleAddProduct = async (
+    product: Product
+  ) => {
+    if (isSupabaseConfigured && supabase) {
+      await supabase
+        .from("products")
+        .insert([product]);
+    }
+    fetchProducts();
+  };
+
+  const handleDeleteProduct = async (
+    id: string
+  ) => {
+    if (isSupabaseConfigured && supabase) {
+      await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+    }
+    fetchProducts();
+  };
+
+  // =============================
+  // EFFECTS
   // =============================
   useEffect(() => {
     fetchProducts();
@@ -101,96 +199,21 @@ const App: React.FC = () => {
       60000
     );
 
-    let prodChannel: any;
-    let configChannel: any;
-
-    if (isSupabaseConfigured && supabase) {
-      prodChannel = supabase
-        .channel('products_realtime')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'products' },
-          () => fetchProducts()
-        )
-        .subscribe();
-
-      configChannel = supabase
-        .channel('config_realtime')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'store_config' },
-          () => fetchStoreConfig()
-        )
-        .subscribe();
-    }
-
-    return () => {
-      clearInterval(timer);
-
-      if (supabase && prodChannel) supabase.removeChannel(prodChannel);
-      if (supabase && configChannel) supabase.removeChannel(configChannel);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   // =============================
-  // HANDLERS
-  // =============================
-  const handleToggleAvailability = async (id: string) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
-    const newStatus = !product.available;
-
-    setProducts(prev =>
-      prev.map(p => p.id === id ? { ...p, available: newStatus } : p)
-    );
-
-    if (isSupabaseConfigured && supabase) {
-      await supabase
-        .from('products')
-        .update({ available: newStatus })
-        .eq('id', id);
-    }
-  };
-
-  const handleUpdateStoreConfig = async (
-    type: 'delivery' | 'pickup',
-    currentStatus: boolean
-  ) => {
-    const newStatus = !currentStatus;
-
-    setStoreConfig(prev => ({ ...prev, [type]: newStatus }));
-
-    if (isSupabaseConfigured && supabase) {
-      await supabase
-        .from('store_config')
-        .update({ status: newStatus })
-        .eq('id', type);
-    }
-  };
-
-  const handleAddProduct = async (product: Product) => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from('products').insert([product]);
-    }
-    fetchProducts();
-  };
-
-  const handleDeleteProduct = async (id: string) => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from('products').delete().eq('id', id);
-    }
-    fetchProducts();
-  };
-
-  // =============================
-  // MENU AGRUPADO
+  // GROUP MENU
   // =============================
   const groupedMenu = useMemo(() => {
-    const groups: Partial<Record<Category, Product[]>> = {};
+    const groups: Partial<
+      Record<Category, Product[]>
+    > = {};
 
     Object.values(Category).forEach(cat => {
-      groups[cat] = products.filter(item => item.category === cat);
+      groups[cat] = products.filter(
+        item => item.category === cat
+      );
     });
 
     return groups;
@@ -199,82 +222,161 @@ const App: React.FC = () => {
   // =============================
   // VIEWS
   // =============================
-  if (view === 'CHECKOUT')
+  if (view === "CHECKOUT")
     return (
       <Checkout
         cart={cart}
         subtotal={subtotal}
-        onBack={() => setView('MENU')}
+        onBack={() => setView("MENU")}
         isStoreOpen={isStoreOpen}
         storeConfig={storeConfig}
       />
     );
 
-  if (view === 'MANAGER_LOGIN')
+  if (view === "MANAGER_LOGIN")
     return (
       <ManagerLogin
-        onLoginSuccess={() => setView('MANAGER_DASHBOARD')}
-        onBack={() => setView('MENU')}
+        onLoginSuccess={() =>
+          setView("MANAGER_DASHBOARD")
+        }
+        onBack={() => setView("MENU")}
       />
     );
 
-  if (view === 'MANAGER_DASHBOARD')
+  if (view === "MANAGER_DASHBOARD")
     return (
       <ManagerDashboard
         products={products}
         storeConfig={storeConfig}
-        onUpdateStoreConfig={handleUpdateStoreConfig}
-        onToggleAvailability={handleToggleAvailability}
+        onUpdateStoreConfig={
+          handleUpdateStoreConfig
+        }
+        onToggleAvailability={
+          handleToggleAvailability
+        }
         onAddProduct={handleAddProduct}
         onDeleteProduct={handleDeleteProduct}
-        onUpdatePassword={setManagerPassword}
-        onLogout={() => setView('MENU')}
-        onBack={() => setView('MENU')}
+        onUpdatePassword={
+          setManagerPassword
+        }
+        onLogout={() => setView("MENU")}
+        onBack={() => setView("MENU")}
       />
     );
 
   // =============================
-  // UI PRINCIPAL
+  // MAIN UI
   // =============================
-  return (
-    <div className="min-h-screen flex flex-col bg-brand-cream">
-      <main className="max-w-2xl mx-auto w-full px-4">
-        <StoreStatus isOpen={isStoreOpen} />
+return (
+  <div className="min-h-screen flex flex-col bg-brand-cream">
 
-        {loading ? (
-          <div className="py-20 text-center">
-            <Loader2 className="animate-spin mx-auto" size={32} />
-          </div>
-        ) : (
-          <div className="space-y-12 pb-40">
-            {Object.entries(groupedMenu).map(([category, items]) =>
-              items && items.length > 0 ? (
-                <section
-                  key={category}
-                  ref={(el: HTMLDivElement | null) => {
-                    categoryRefs.current[category] = el;
-                  }}
-                >
-                  <h2 className="text-2xl font-bold">{category}</h2>
+    {/* HEADER */}
+    <header className="relative h-[450px] flex items-center justify-center overflow-hidden">
 
-                  {items.map(product => (
-                    <MenuItem
-                      key={product.id}
-                      product={product}
-                      quantity={
-                        cart.find(i => i.id === product.id)?.quantity || 0
-                      }
-                      onUpdateQuantity={handleUpdateQuantity}
-                    />
-                  ))}
-                </section>
-              ) : null
-            )}
-          </div>
-        )}
-      </main>
-    </div>
-  );
+      {/* Gradiente */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-orange via-brand-yellow to-brand-orange opacity-95"></div>
+
+      {/* Textura */}
+      <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+
+      <motion.div
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="relative z-10 flex flex-col items-center"
+      >
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-64 h-64 object-contain mb-4"
+        />
+        <h1 className="text-5xl font-black text-brand-dark">
+          Casa da <span className="text-white italic">Esfirra</span>
+        </h1>
+      </motion.div>
+    </header>
+
+    <main className="max-w-2xl mx-auto w-full px-4">
+
+      <StoreStatus isOpen={isStoreOpen} />
+
+      {loading ? (
+        <div className="py-20 text-center">
+          <Loader2 className="animate-spin mx-auto" size={32} />
+        </div>
+      ) : (
+        <div className="space-y-12 pb-40">
+
+          {(Object.entries(groupedMenu) as [
+            Category,
+            Product[]
+          ][])
+            .filter(([, items]) => items && items.length > 0)
+            .map(([category, items]) => (
+              <section
+                key={category}
+                ref={(el: HTMLDivElement | null) =>
+                  (categoryRefs.current[category] = el)
+                }
+              >
+                <h2 className="text-2xl font-bold">
+                  {category}
+                </h2>
+
+                {items.map(product => (
+                  <MenuItem
+                    key={product.id}
+                    product={product}
+                    quantity={
+                      cart.find(i => i.id === product.id)?.quantity || 0
+                    }
+                    onUpdateQuantity={handleUpdateQuantity}
+                  />
+                ))}
+              </section>
+            ))}
+        </div>
+      )}
+    </main>
+
+    {/* CART BUTTON */}
+    <AnimatePresence>
+      {!isEmpty && (
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          exit={{ y: 100 }}
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[92%] max-w-md"
+        >
+          <button
+            onClick={() => setView("CHECKOUT")}
+            className="w-full bg-brand-dark text-white rounded-xl p-4 flex justify-between"
+          >
+            <span>{totalItems} itens</span>
+            <span>{formattedSubtotal}</span>
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* FOOTER */}
+    <footer className="relative mt-20 pt-32 pb-16 text-center overflow-hidden rounded-t-[4rem]">
+
+      {/* Gradiente */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-orange via-brand-yellow to-brand-orange opacity-95"></div>
+
+      {/* Textura */}
+      <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+
+      <div className="relative z-10 text-brand-dark">
+        <Instagram className="mx-auto mb-4" />
+        <button onClick={() => setView("MANAGER_LOGIN")}>
+          <Lock size={14} />
+        </button>
+      </div>
+    </footer>
+
+  </div>
+);
 };
 
 export default App;
