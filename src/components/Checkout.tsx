@@ -142,18 +142,45 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
         </section>
       </div>
 
-      {/* BOTÃO FINAL (Usa o ícone MESSAGECIRCLE) */}
+{/* BOTÃO FINAL (Usa o ícone MESSAGECIRCLE) - CORRIGIDO COM TRAVA DE LOJA FECHADA */}
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-brand-dark/5 z-50 shadow-2xl">
-        <div className="max-w-xl mx-auto text-center">
-          <button onClick={handleSubmit} disabled={isEmpty} 
-            className="w-full bg-brand-orange text-white py-6 rounded-3xl font-black text-lg shadow-floating flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-30">
-            <span>Pedir no WhatsApp</span>
-            <MessageCircle size={24} fill="white" />
+        <div className="max-w-xl mx-auto text-center space-y-4">
+
+          {/* AVISO DE LOJA FECHADA (Só aparece se isStoreOpen for falso) */}
+          {!isStoreOpen && (
+            <div className="p-4 bg-red-50 border-2 border-red-200 rounded-3xl flex items-center justify-center gap-3 text-red-700 animate-bounce">
+              <Store size={24} className="text-red-500" />
+              <p className="font-black text-xs uppercase tracking-widest">Loja Fechada no Momento</p>
+            </div>
+          )}
+
+          {/* BOTÃO DO WHATSAPP (Agora bloqueado se a loja estiver fechada) */}
+          <button
+            onClick={handleSubmit}
+            // Adicionamos a verificação !isStoreOpen aqui 👇
+            disabled={isEmpty || !isStoreOpen}
+            className={`
+              w-full py-6 rounded-3xl
+              font-black text-lg uppercase tracking-widest
+              flex items-center justify-center gap-4
+              shadow-floating transition-all
+              ${
+                // Muda a cor e o cursor se estiver fechado
+                !isStoreOpen
+                  ? 'bg-brand-dark/20 text-brand-dark/40 cursor-not-allowed' // Estilo Fechado
+                  : 'bg-brand-orange text-white hover:scale-[1.02] active:scale-95' // Estilo Aberto
+              }
+              disabled:opacity-70
+            `}
+          >
+            <span>{!isStoreOpen ? 'Não estamos aceitando pedidos' : 'Pedir no WhatsApp'}</span>
+            {/* Ícone também muda ou some se estiver fechado */}
+            {isStoreOpen && <MessageCircle size={24} fill="white" />}
           </button>
         </div>
-      </div>
+      </div>  
     </div>
   );
-};
+}
 
-export default Checkout;
+export default Checkout;0
