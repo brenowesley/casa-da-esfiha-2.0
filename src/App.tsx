@@ -264,9 +264,9 @@ const App: React.FC = () => {
       />
     );
 
-  // =============================
-  // MAIN UI
-  // =============================
+ // =============================
+// MAIN UI
+// =============================
 return (
   <div className="min-h-screen flex flex-col bg-brand-cream">
 
@@ -304,7 +304,7 @@ return (
           <Loader2 className="animate-spin mx-auto" size={32} />
         </div>
       ) : (
-        <div className="space-y-12 pb-40">
+        <div className="space-y-12 pb-44">
 
           {(Object.entries(groupedMenu) as [
             Category,
@@ -318,7 +318,7 @@ return (
                   (categoryRefs.current[category] = el)
                 }
               >
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-2xl font-bold mb-4">
                   {category}
                 </h2>
 
@@ -338,25 +338,47 @@ return (
       )}
     </main>
 
-    {/* CART BUTTON */}
-    <AnimatePresence>
-      {!isEmpty && (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          exit={{ y: 100 }}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[92%] max-w-md"
-        >
-          <button
-            onClick={() => setView("CHECKOUT")}
-            className="w-full bg-brand-dark text-white rounded-xl p-4 flex justify-between"
-          >
-            <span>{totalItems} itens</span>
-            <span>{formattedSubtotal}</span>
-          </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    {/* CART BUTTON — PREMIUM */}
+<AnimatePresence>
+  {!isEmpty && (
+    <motion.div
+      initial={{ y: 120, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 120, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 120 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-xl z-50"
+    >
+      <button
+        onClick={() => setView("CHECKOUT")}
+        className="
+          w-full
+          rounded-2xl
+          px-6 py-5
+          flex justify-between items-center
+          text-white
+          font-semibold text-lg
+
+          bg-gradient-to-r
+          from-brand-yellow
+          
+          to-brand-orange
+
+          shadow-[0_10px_40px_rgba(0,0,0,0.35)]
+          border border-white/10
+          backdrop-blur-md
+
+          hover:scale-[1.02]
+          active:scale-[0.98]
+          transition-all
+        "
+      >
+        <span>{totalItems} itens</span>
+        <span className="font-bold">{formattedSubtotal}</span>
+      </button>
+    </motion.div>
+  )}
+</AnimatePresence>
+
 
     {/* FOOTER */}
     <footer className="relative mt-20 pt-32 pb-16 text-center overflow-hidden rounded-t-[4rem]">
@@ -378,5 +400,4 @@ return (
   </div>
 );
 };
-
 export default App;
