@@ -84,7 +84,7 @@ Referência: ${data.referencia || 'Nenhuma'}`;
   }
 
   const message = `
-📦 *Novo Pedido - Casa da Esfirra* 🍕${avisoFechado}
+📦 *Novo Pedido - Casa da Esfiha* 🍕${avisoFechado}
 ----------------------------------------
 🍽️ *Itens selecionados:*
 ${itemsList}

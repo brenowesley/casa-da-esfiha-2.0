@@ -1,76 +1,71 @@
 import React from 'react';
-import { AlertCircle, CheckCircle2, Moon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Store, Bed } from 'lucide-react';
 
 interface StoreStatusProps {
   isOpen: boolean;
 }
 
 const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
-  // 1. Lógica isolada para não poluir o JSX
-  const today = new Date().getDay(); 
-  const isMonday = today === 1;
-
-
-
   return (
-    <div className={`
-      mx-auto max-w-2xl mt-4 rounded-[2rem] border transition-all duration-500 overflow-hidden
-      ${isOpen 
-        ? 'bg-emerald-50/50 border-emerald-100 text-emerald-900 shadow-sm shadow-emerald-100/50' 
-        : 'bg-brand-dark/5 border-brand-dark/10 text-brand-dark/60'}
-    `}>
-      <div className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        
-        {/* Lado Esquerdo: Status Principal */}
-        <div className="flex items-center gap-3">
-          {isOpen ? (
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 shadow-lg shadow-emerald-200">
-               <CheckCircle2 size={20} className="text-white" />
-               <span className="animate-ping absolute inset-0 rounded-2xl bg-emerald-400 opacity-40"></span>
+    <AnimatePresence mode="wait">
+      {isOpen ? (
+        // ESTADO: LOJA ABERTA
+        <motion.div
+          key="open"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="bg-brand-cream rounded-[2.5rem] p-1 shadow-premium mb-8 animate-fade-up"
+        >
+          <div className="bg-white rounded-[2.3rem] p-6 flex items-center gap-5 border border-brand-dark/5 relative overflow-hidden">
+            <div className="absolute right-0 top-0 opacity-5">
+              <Store size={100} />
             </div>
-          ) : (
-            <div className="w-10 h-10 flex items-center justify-center rounded-2xl bg-brand-dark/10">
-               <Moon size={20} className="text-brand-dark/40" />
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 z-10">
+              <Store size={26} />
             </div>
-          )}
-
-     {/*     <div className="text-center sm:text-left">
-            <p className={`text-sm font-black uppercase tracking-widest ${isOpen ? 'text-emerald-600' : 'text-brand-dark/40'}`}>
-              {isOpen ? 'Estamos Abertos!' : 'Loja Fechada'}
-            </p>
-            <p className="text-[11px] font-bold opacity-60">
-              {isOpen 
-                ? `Garanta sua esfirra até às ${times.close}h` 
-                : isMonday 
-                  ? 'Segunda é dia de descanso do Gênio' 
-                  : `Reabriremos hoje às ${times.open}h`}
-            </p>
-          </div>*/}
-        </div>
-
-        {/* Lado Direito: Badge de Horário */}
-      {/*   <div className={`
-          flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-tighter border
-          ${isOpen 
-            ? 'bg-white/60 border-emerald-200 text-emerald-700' 
-            : 'bg-brand-dark/5 border-brand-dark/10 text-brand-dark/40'}
-        `}>
-          <Clock size={12} strokeWidth={3} />
-          {isMonday ? 'Ter a Dom' : `${times.open} às ${times.close}`}
-        </div>*/}
-
-      </div>
-
-      {/* 3. Rodapé informativo sutil se estiver fechado */}
-      {!isOpen && !isMonday && (
-        <div className="bg-brand-orange/10 px-6 py-2 flex items-center justify-center gap-2 border-t border-brand-orange/5">
-           <AlertCircle size={12} className="text-brand-orange" />
-           <span className="text-[10px] font-black text-brand-orange uppercase tracking-widest">
-             Você pode navegar e montar seu carrinho agora!
-           </span>
-        </div>
+            <div>
+              <h2 className="text-xl font-serif font-black text-brand-dark leading-none">Loja Aberta!</h2>
+              <p className="text-xs font-bold text-brand-dark/40 uppercase tracking-widest mt-1">Faça seu pedido agora</p>
+            </div>
+          </div>
+          <div className="bg-emerald-500/10 text-emerald-700 text-center py-3 rounded-b-[2.3rem] flex items-center justify-center gap-2">
+             <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Aceitando Pedidos</span>
+          </div>
+        </motion.div>
+      ) : (
+        // ESTADO: LOJA FECHADA (Com a nova mensagem do Gênio)
+        <motion.div
+          key="closed"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="bg-brand-cream rounded-[2.5rem] p-1 shadow-premium mb-8 animate-fade-up"
+        >
+          <div className="bg-white rounded-[2.3rem] p-6 flex items-center gap-5 border border-brand-dark/5 relative overflow-hidden">
+            <div className="absolute right-0 top-0 opacity-5">
+              <Bed size={100} />
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-brand-dark flex items-center justify-center text-white shadow-lg z-10">
+              <Bed size={26} />
+            </div>
+            <div>
+              {/* NOVA MENSAGEM AQUI */}
+              <h2 className="text-xl font-serif font-black text-brand-dark leading-none">Gênio Descansando</h2>
+              <p className="text-xs font-bold text-brand-dark/40 uppercase tracking-widest mt-1">Voltaremos em breve!</p>
+            </div>
+          </div>
+          {/* BARRA INFERIOR COM O AVISO */}
+          <div className="bg-brand-dark/5 text-brand-dark/60 text-center py-3 rounded-b-[2.3rem] flex items-center justify-center gap-2">
+             <span className="text-[10px] font-black uppercase tracking-[0.1em]">
+               Hoje o gênio das esfihas vai descansar 😴
+             </span>
+          </div>
+        </motion.div>
       )}
-    </div>
+    </AnimatePresence>
   );
 };
 
