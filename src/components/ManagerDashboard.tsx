@@ -11,7 +11,8 @@ interface ManagerDashboardProps {
   storeConfig: {
     store_open: any; delivery: boolean, pickup: boolean 
 };
-  onUpdateStoreConfig: (type: 'delivery' | 'pickup', currentStatus: boolean) => Promise<void>;
+ // Mude para isto:
+onUpdateStoreConfig: (configId: string, currentStatus: boolean) => Promise<void>;
   onToggleAvailability: (id: string) => Promise<void>;
   onAddProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
