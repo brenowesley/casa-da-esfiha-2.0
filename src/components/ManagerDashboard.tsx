@@ -145,60 +145,35 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                   {storeConfig.delivery ? <CheckCircle size={24} /> : <XCircle size={24} />}
                 </button>
 
-                {/* Botão Loja Aberta / Fechada */}
+{/* Botão Loja Aberta / Fechada - CORRIGIDO */}
 <button
   disabled={loadingConfig === 'store_open'}
-  onClick={() =>
-    handleUpdateConfig('store_open' as any, storeConfig.store_open)
-  }
+  // O uso de 'as any' aqui indica um problema de tipagem que explico abaixo
+  onClick={() => handleUpdateConfig('store_open' as any, storeConfig.store_open)}
   className={`p-6 rounded-[2.5rem] flex items-center justify-between border-2 transition-all active:scale-95 ${
     storeConfig.store_open
       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-      : 'bg-red-50 border-red-200 text-red-700'
+      : 'bg-red-50 border-red-200 text-red-700 opacity-80'
   }`}
->   
-
-    {/* botão Loja Aberta / Fechada */}
+>
   <div className="flex items-center gap-4">
-    <div
-      className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${
-        storeConfig.store_open ? 'bg-emerald-500' : 'bg-red-500'
-      } text-white`}
-    >
-      🏪
+    {/* Ícone da esquerda com Loading */}
+    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${storeConfig.store_open ? 'bg-emerald-500' : 'bg-red-500'} text-white`}>
+      {loadingConfig === 'store_open' ? (
+        <Loader2 className="animate-spin" />
+      ) : (
+        // Usei o ícone 'Store' aqui para manter o padrão, ou use outro ícone da Lucide
+        <Store size={24} />
+      )}
     </div>
     <div className="text-left leading-tight">
-      <p className="font-black text-xs uppercase tracking-widest">
-        Loja
-      </p>
-      <p className="text-[10px] font-bold opacity-60 uppercase">
-        {storeConfig.store_open ? 'Aberta' : 'Fechada'}
-      </p>
+      <p className="font-black text-xs uppercase tracking-widest">Loja</p>
+      <p className="text-[10px] font-bold opacity-60 uppercase">{storeConfig.store_open ? 'Aberta' : 'Fechada'}</p>
     </div>
   </div>
+  {/* Ícone da direita (Check ou X) que faltava */}
+  {storeConfig.store_open ? <CheckCircle size={24} /> : <XCircle size={24} />}
 </button>
-
-                {/* Botão Retirada */}
-                <button 
-                  disabled={loadingConfig === 'pickup'}
-                  onClick={() => handleUpdateConfig('pickup', storeConfig.pickup)}
-                  className={`p-6 rounded-[2.5rem] flex items-center justify-between border-2 transition-all active:scale-95 ${
-                    storeConfig.pickup 
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
-                    : 'bg-red-50 border-red-200 text-red-700 opacity-80'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${storeConfig.pickup ? 'bg-emerald-500' : 'bg-red-500'} text-white`}>
-                      {loadingConfig === 'pickup' ? <Loader2 className="animate-spin" /> : <Store size={24} />}
-                    </div>
-                    <div className="text-left leading-tight">
-                      <p className="font-black text-xs uppercase tracking-widest">Retirada</p>
-                      <p className="text-[10px] font-bold opacity-60 uppercase">{storeConfig.pickup ? 'Ativo' : 'Pausado'}</p>
-                    </div>
-                  </div>
-                  {storeConfig.pickup ? <CheckCircle size={24} /> : <XCircle size={24} />}
-                </button>
               </div>
             </section>
 
