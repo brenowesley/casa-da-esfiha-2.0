@@ -354,14 +354,14 @@ return (
 
                 {items.map(product => (
                   <MenuItem
-                    key={product.id}
-                    product={product}
-                    quantity={
-                      cart.find(i => i.id === product.id)?.quantity || 0
-                    }
-                    onUpdateQuantity={handleUpdateQuantity}
-                  />
-                ))}
+    key={product.id}
+    product={product}
+    quantity={cart.find(i => i.id === product.id)?.quantity || 0}
+    onUpdateQuantity={handleUpdateQuantity}
+    // 👇 ADICIONE ESTA LINHA AQUI 👇
+    isStoreOpen={isStoreOpen}
+  />
+))}
               </section>
             ))}
         </div>
