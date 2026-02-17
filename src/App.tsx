@@ -13,18 +13,20 @@ import StoreStatus from './components/StoreStatus';
 import ManagerLogin from './components/ManagerLogin';
 import ManagerDashboard from './components/ManagerDashboard';
 
-// Style & Icons
-import { ShoppingBasket, Instagram, Lock, ChevronRight, Star, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Icons
+import { Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'MENU' | 'CHECKOUT' | 'MANAGER_LOGIN' | 'MANAGER_DASHBOARD'>('MENU');
-  const [activeCategory, setActiveCategory] = useState<Category>(Category.TRADICIONAL);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(checkStoreOpen());
-  const [storeConfig, setStoreConfig] = useState({ store_open: true, delivery: true, pickup: true });
+  const [storeConfig, setStoreConfig] = useState({
+    store_open: true,
+    delivery: true,
+    pickup: true,
+  });
 
   const [_, setManagerPassword] = useState<string>(() =>
     localStorage.getItem('manager_password') || MANAGER_CREDENTIALS.password
@@ -32,7 +34,7 @@ const App: React.FC = () => {
 
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { cart, handleUpdateQuantity, totalItems, formattedSubtotal, isEmpty, subtotal } = useCart(products);
+  const { cart, handleUpdateQuantity, subtotal } = useCart(products);
 
   // =============================
   // FETCH PRODUCTS
@@ -182,20 +184,8 @@ const App: React.FC = () => {
   };
 
   // =============================
-  // SCROLL SAFE
+  // MENU AGRUPADO
   // =============================
-  const scrollTo = (cat: Category) => {
-    setActiveCategory(cat);
-
-    const el = categoryRefs.current[cat];
-    if (!el) return;
-
-    window.scrollTo({
-      top: el.offsetTop - 120,
-      behavior: 'smooth',
-    });
-  };
-
   const groupedMenu = useMemo(() => {
     const groups: Partial<Record<Category, Product[]>> = {};
 
