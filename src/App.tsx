@@ -346,12 +346,12 @@ return (
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 120, opacity: 0 }}
       transition={{ type: "spring", stiffness: 120 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-xl z-50"
+      className="fixed bottom-6 left-0 w-full flex justify-center z-50"
     >
       <button
         onClick={() => setView("CHECKOUT")}
         className="
-          w-full
+          w-[92%] max-w-xl
           rounded-2xl
           px-6 py-5
           flex justify-between items-center
@@ -359,9 +359,9 @@ return (
           font-semibold text-lg
 
           bg-gradient-to-r
-          from-brand-yellow
-          
-          to-brand-orange
+          from-brand-dark
+          via-[#2a1a12]
+          to-brand-dark
 
           shadow-[0_10px_40px_rgba(0,0,0,0.35)]
           border border-white/10
