@@ -145,25 +145,37 @@ const App: React.FC = () => {
     }
   };
 
+  // Agora aceita qualquer ID (incluindo 'store_open')
   const handleUpdateStoreConfig = async (
-    type: "delivery" | "pickup",
+    configId: string,
     currentStatus: boolean
   ) => {
     const newStatus = !currentStatus;
 
+    // Atualiza o estado local imediatamente para parecer rápido
     setStoreConfig(prev => ({
       ...prev,
-      [type]: newStatus
+      // Usa o ID genérico para atualizar a chave correta no estado
+      [configId]: newStatus
     }));
 
+    // Envia para o Supabase
     if (isSupabaseConfigured && supabase) {
-      await supabase
+      const { error } = await supabase
         .from("store_config")
         .update({ status: newStatus })
-        .eq("id", type);
+        .eq("id", configId);
+
+      if (error) {
+        console.error("Erro ao atualizar config no Supabase:", error);
+        // Opcional: Reverter o estado local se der erro no banco
+        setStoreConfig(prev => ({
+            ...prev,
+            [configId]: currentStatus // volta para o status antigo
+          }));
+      }
     }
   };
-
   const handleAddProduct = async (
     product: Product
   ) => {
