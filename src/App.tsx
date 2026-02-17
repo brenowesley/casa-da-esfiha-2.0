@@ -109,11 +109,19 @@ const App: React.FC = () => {
       data.find((i: any) => i.id === id)
         ?.status ?? fallback;
 
+    // PEGA O VALOR DO BANCO
+    const isOpenFromDb = getStatus("store_open");
+
+    // ATUALIZA O OBJETO DE CONFIGURAÇÃO GERAL
     setStoreConfig({
-      store_open: getStatus("store_open"),
+      store_open: isOpenFromDb,
       delivery: getStatus("delivery"),
       pickup: getStatus("pickup")
     });
+
+    // --- AQUI ESTAVA FALTANDO ---
+    // ATUALIZA TAMBÉM O ESTADO QUE O CHECKOUT USA
+    setIsStoreOpen(isOpenFromDb);
   };
 
   // =============================
@@ -145,21 +153,29 @@ const App: React.FC = () => {
     }
   };
 
-  // Agora aceita qualquer ID (incluindo 'store_open')
+// Agora aceita qualquer ID (incluindo 'store_open')
   const handleUpdateStoreConfig = async (
     configId: string,
     currentStatus: boolean
   ) => {
     const newStatus = !currentStatus;
 
-    // Atualiza o estado local imediatamente para parecer rápido
+    // 1. Atualiza o estado local imediatamente para parecer rápido (muda a cor do botão)
     setStoreConfig(prev => ({
       ...prev,
       // Usa o ID genérico para atualizar a chave correta no estado
       [configId]: newStatus
     }));
 
-    // Envia para o Supabase
+    // -------------------------------------------------------
+    // ADICIONE ISTO AQUI 👇
+    // 2. Se o que estamos mudando é o "store_open", atualiza o estado PRINCIPAL que bloqueia o carrinho
+    if (configId === 'store_open') {
+      setIsStoreOpen(newStatus);
+    }
+    // -------------------------------------------------------
+
+    // 3. Envia para o Supabase
     if (isSupabaseConfigured && supabase) {
       const { error } = await supabase
         .from("store_config")
@@ -173,6 +189,8 @@ const App: React.FC = () => {
             ...prev,
             [configId]: currentStatus // volta para o status antigo
           }));
+        // E reverter o isStoreOpen também, se foi ele que mudou
+        if (configId === 'store_open') setIsStoreOpen(currentStatus);
       }
     }
   };
