@@ -359,9 +359,9 @@ return (
           font-semibold text-lg
 
           bg-gradient-to-r
-          from-brand-dark
-          via-[#2a1a12]
-          to-brand-dark
+          from-brand-yellow
+          via-brand-orange
+          to-brand-orange
 
           shadow-[0_10px_40px_rgba(0,0,0,0.35)]
           border border-white/10
