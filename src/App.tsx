@@ -61,9 +61,9 @@ const App: React.FC = () => {
     }
   );
 
-  // =============================
+
   // FETCH PRODUCTS
-  // =============================
+
   const fetchProducts = async () => {
     try {
       if (!isSupabaseConfigured || !supabase) {
@@ -91,9 +91,9 @@ const App: React.FC = () => {
     }
   };
 
-  // =============================
+
   // STORE CONFIG
-  // =============================
+
   const fetchStoreConfig = async () => {
     if (!isSupabaseConfigured || !supabase) return;
 
@@ -119,14 +119,14 @@ const App: React.FC = () => {
       pickup: getStatus("pickup")
     });
 
-    // --- AQUI ESTAVA FALTANDO ---
+ 
     // ATUALIZA TAMBÉM O ESTADO QUE O CHECKOUT USA
     setIsStoreOpen(isOpenFromDb);
   };
 
-  // =============================
+ 
   // DASHBOARD HANDLERS
-  // =============================
+
   const handleToggleAvailability = async (
     id: string
   ) => {
@@ -153,29 +153,27 @@ const App: React.FC = () => {
     }
   };
 
-// Agora aceita qualquer ID (incluindo 'store_open')
+
   const handleUpdateStoreConfig = async (
     configId: string,
     currentStatus: boolean
   ) => {
     const newStatus = !currentStatus;
 
-    // 1. Atualiza o estado local imediatamente para parecer rápido (muda a cor do botão)
+
     setStoreConfig(prev => ({
       ...prev,
-      // Usa o ID genérico para atualizar a chave correta no estado
+     
       [configId]: newStatus
     }));
 
-    // -------------------------------------------------------
-    // ADICIONE ISTO AQUI 👇
-    // 2. Se o que estamos mudando é o "store_open", atualiza o estado PRINCIPAL que bloqueia o carrinho
+  
+
     if (configId === 'store_open') {
       setIsStoreOpen(newStatus);
     }
-    // -------------------------------------------------------
-
-    // 3. Envia para o Supabase
+   
+    
     if (isSupabaseConfigured && supabase) {
       const { error } = await supabase
         .from("store_config")
@@ -184,12 +182,12 @@ const App: React.FC = () => {
 
       if (error) {
         console.error("Erro ao atualizar config no Supabase:", error);
-        // Opcional: Reverter o estado local se der erro no banco
+    
         setStoreConfig(prev => ({
             ...prev,
-            [configId]: currentStatus // volta para o status antigo
+            [configId]: currentStatus 
           }));
-        // E reverter o isStoreOpen também, se foi ele que mudou
+    
         if (configId === 'store_open') setIsStoreOpen(currentStatus);
       }
     }
@@ -217,9 +215,9 @@ const App: React.FC = () => {
     fetchProducts();
   };
 
-  // =============================
+ 
   // EFFECTS
-  // =============================
+ 
   useEffect(() => {
     fetchProducts();
     fetchStoreConfig();
@@ -232,9 +230,9 @@ const App: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // =============================
+ 
   // GROUP MENU
-  // =============================
+
   const groupedMenu = useMemo(() => {
     const groups: Partial<
       Record<Category, Product[]>
@@ -249,9 +247,9 @@ const App: React.FC = () => {
     return groups;
   }, [products]);
 
-  // =============================
+ 
   // VIEWS
-  // =============================
+ 
   if (view === "CHECKOUT")
     return (
       <Checkout
@@ -294,9 +292,9 @@ const App: React.FC = () => {
       />
     );
 
- // =============================
-// MAIN UI
-// =============================
+
+//  UI
+
 return (
   <div className="min-h-screen flex flex-col bg-brand-cream">
 
@@ -358,7 +356,7 @@ return (
     product={product}
     quantity={cart.find(i => i.id === product.id)?.quantity || 0}
     onUpdateQuantity={handleUpdateQuantity}
-    // 👇 ADICIONE ESTA LINHA AQUI 👇
+   
     isStoreOpen={isStoreOpen}
   />
 ))}
@@ -368,7 +366,7 @@ return (
       )}
     </main>
 
-    {/* CART BUTTON — PREMIUM */}
+    {/* CART BUTTON */}
 <AnimatePresence>
   {!isEmpty && (
     <motion.div
