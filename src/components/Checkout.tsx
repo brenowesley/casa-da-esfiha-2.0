@@ -157,7 +157,6 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
           {/* BOTÃO DO WHATSAPP (Agora bloqueado se a loja estiver fechada) */}
           <button
             onClick={handleSubmit}
-            // Adicionamos a verificação !isStoreOpen aqui 👇
             disabled={isEmpty || !isStoreOpen}
             className={`
               w-full py-6 rounded-3xl
@@ -165,16 +164,16 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
               flex items-center justify-center gap-4
               shadow-floating transition-all
               ${
-                // Muda a cor e o cursor se estiver fechado
+             
                 !isStoreOpen
-                  ? 'bg-brand-dark/20 text-brand-dark/40 cursor-not-allowed' // Estilo Fechado
-                  : 'bg-brand-orange text-white hover:scale-[1.02] active:scale-95' // Estilo Aberto
+                  ? 'bg-brand-dark/20 text-brand-dark/40 cursor-not-allowed' 
+                  : 'bg-brand-orange text-white hover:scale-[1.02] active:scale-95' 
               }
               disabled:opacity-70
             `}
           >
             <span>{!isStoreOpen ? 'Não estamos aceitando pedidos' : 'Pedir no WhatsApp'}</span>
-            {/* Ícone também muda ou some se estiver fechado */}
+          
             {isStoreOpen && <MessageCircle size={24} fill="white" />}
           </button>
         </div>
