@@ -7,13 +7,11 @@ interface MenuItemProps {
   product: Product;
   quantity: number;
   onUpdateQuantity: (id: string, delta: number) => void;
-  // 👇 1. Nova propriedade adicionada na interface
   isStoreOpen: boolean;
 }
 
-// 👇 2. Recebendo a propriedade no componente
 const MenuItem: React.FC<MenuItemProps> = ({ product, quantity, onUpdateQuantity, isStoreOpen }) => {
-  // Se o produto específico estiver indisponível, mostra o bloco cinza
+
   if (!product.available) {
     return (
       <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 bg-gray-50 opacity-60 grayscale">
@@ -30,7 +28,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ product, quantity, onUpdateQuantity
     );
   }
 
-  // Se o produto está disponível, renderiza os controles
+
   return (
     <div className={`
       flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors
@@ -63,7 +61,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ product, quantity, onUpdateQuantity
           {quantity}
         </span>
 
-        {/* 👇 3. Botão de aumentar (+) COM A TRAVA DE LOJA FECHADA */}
+        {/* Botão de aumentar (+) COM A TRAVA DE LOJA FECHADA */}
         <button
           onClick={() => onUpdateQuantity(product.id, 1)}
           // Bloqueia se a loja NÃO estiver aberta (!isStoreOpen)
@@ -71,8 +69,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ product, quantity, onUpdateQuantity
           className={`
             w-8 h-8 flex items-center justify-center rounded-full transition-all shadow-sm
             ${!isStoreOpen
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' // Estilo quando fechado (cinza)
-              : 'bg-brand-yellow text-brand-darkRed hover:bg-brand-yellowHover hover:scale-105 active:scale-95' // Estilo normal (amarelo)
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-brand-yellow text-brand-darkRed hover:bg-brand-yellowHover hover:scale-105 active:scale-95' 
             }
           `}
           aria-label="Increase quantity"
