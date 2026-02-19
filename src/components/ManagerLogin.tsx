@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
 import { MANAGER_CREDENTIALS } from '../constants';
-import { motion } from 'framer-motion'; // Faltava esse import!
+import { motion } from 'framer-motion'; 
 
 interface ManagerLoginProps {
   onLoginSuccess: () => void;
