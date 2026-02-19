@@ -20,9 +20,9 @@ export const getDeliveryFee = (bairro: string): number => {
 
 export const checkStoreOpen = (): boolean => {
   const now = new Date();
-  const day = now.getDay(); // 0 = Domingo, 1 = Segunda, ... 6 = Sábado
+  const day = now.getDay(); 
 
-  // Fechado na Segunda-feira (1)
+  // Fechado na Segunda-feira 
   if (day === 1) {
     return false;
   }
