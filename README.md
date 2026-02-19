@@ -13,3 +13,4 @@ Animações: Framer Motion
 Banco de Dados & Realtime: Supabase
 Ícones: Lucide React
 Build Tool: Vite
+obs: usei supabase por que não sei ainda o back-end to aprendendo
