@@ -1,10 +1,11 @@
 import { Category, Product, DeliveryFeeMap } from './types';
 
-// CREDENCIAIS DO GERENTE
+
 export const MANAGER_CREDENTIALS = {
   username: 'admin',
   password: '123456' 
 };
+// so botei senha aqui pq como não afeta em dinheiro ou algo do tipo não fiz algo mais profissionalkk preguiça msm
 
 export const OPENING_HOUR = 17;
 export const OPENING_MINUTE = 30;
