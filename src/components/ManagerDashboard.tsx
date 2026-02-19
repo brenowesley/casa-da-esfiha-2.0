@@ -11,7 +11,7 @@ interface ManagerDashboardProps {
   storeConfig: {
     store_open: any; delivery: boolean, pickup: boolean 
 };
- // Mude para isto:
+
 onUpdateStoreConfig: (configId: string, currentStatus: boolean) => Promise<void>;
   onToggleAvailability: (id: string) => Promise<void>;
   onAddProduct: (product: Product) => void;
@@ -36,7 +36,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [loadingConfig, setLoadingConfig] = useState<string | null>(null);
 
-  // Form States
+  
   const [newName, setNewName] = useState('');
   const [newPrice, setNewPrice] = useState('');
   const [newCategory, setNewCategory] = useState<Category>(Category.TRADICIONAL);
@@ -149,7 +149,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 {/* Botão Loja Aberta / Fechada - CORRIGIDO */}
 <button
   disabled={loadingConfig === 'store_open'}
-  // O uso de 'as any' aqui indica um problema de tipagem que explico abaixo
+ 
   onClick={() => handleUpdateConfig('store_open' as any, storeConfig.store_open)}
   className={`p-6 rounded-[2.5rem] flex items-center justify-between border-2 transition-all active:scale-95 ${
     storeConfig.store_open
@@ -163,7 +163,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       {loadingConfig === 'store_open' ? (
         <Loader2 className="animate-spin" />
       ) : (
-        // Usei o ícone 'Store' aqui para manter o padrão, ou use outro ícone da Lucide
+      
         <Store size={24} />
       )}
     </div>
