@@ -10,7 +10,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
   return (
     <AnimatePresence mode="wait">
       {isOpen ? (
-        // ESTADO: LOJA ABERTA
+      
         <motion.div
           key="open"
           initial={{ opacity: 0, y: -20 }}
@@ -36,7 +36,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ isOpen }) => {
           </div>
         </motion.div>
       ) : (
-        // ESTADO: LOJA FECHADA (Com a nova mensagem do Gênio)
+        
         <motion.div
           key="closed"
           initial={{ opacity: 0, y: -20 }}
