@@ -10,7 +10,7 @@ export interface Product {
   name: string;
   price: number;
   category: Category;
-  available: boolean; // Novo campo
+  available: boolean; 
 }
 
 export interface CartItem extends Product {
@@ -33,6 +33,6 @@ export interface CustomerData {
   complemento: string;
   referencia: string;
   paymentMethod: PaymentMethod;
-  changeFor: string; // Troco
+  changeFor: string; 
   observation: string;
 }
