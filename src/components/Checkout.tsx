@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { CartItem, CustomerData, PaymentMethod } from '../types';
 import { formatCurrency, generateWhatsAppMessage, getDeliveryFee } from '../utils';
+import { DELIVERY_FEES } from '../utils/deliveryFees';
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -104,21 +105,58 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
               className="w-full pl-14 pr-6 py-5 rounded-2xl bg-brand-dark/5 border-none outline-none font-bold text-brand-dark focus:ring-2 focus:ring-brand-orange/20 transition-all" />
           </div>
 
-          {/* ENDEREÇO (Usa o ícone HOME) */}
-          {formData.deliveryType === 'delivery' && (
-            <div className="space-y-4 pt-4 border-t border-brand-dark/5 animate-fade-up">
-              <div className="relative">
-                <Home className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-dark/20" size={18} />
-                <input type="text" name="rua" value={formData.rua} onChange={handleChange} placeholder="Rua / Logradouro" 
-                  className="w-full pl-14 pr-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="text" name="numero" value={formData.numero} onChange={handleChange} placeholder="Nº" className="px-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark" />
-                <input type="text" name="bairro" value={formData.bairro} onChange={handleChange} placeholder="Bairro" className="px-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark" />
-              </div>
-            </div>
-          )}
-        </section>
+{/* ENDEREÇO */}
+{formData.deliveryType === 'delivery' && (
+  <div className="space-y-4 pt-4 border-t border-brand-dark/5 animate-fade-up">
+    <div className="relative">
+      <Home
+        className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-dark/20"
+        size={18}
+      />
+      <input
+        type="text"
+        name="rua"
+        value={formData.rua}
+        onChange={handleChange}
+        placeholder="Rua / Logradouro"
+        className="w-full pl-14 pr-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark"
+      />
+    </div>
+
+    <div className="grid grid-cols-2 gap-3">
+      <input
+        type="text"
+        name="numero"
+        value={formData.numero}
+        onChange={handleChange}
+        placeholder="Nº"
+        className="px-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark"
+      />
+
+      {/* SELECT DE BAIRRO */}
+      <select
+        name="bairro"
+        value={formData.bairro}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, bairro: e.target.value }))
+        }
+        className="px-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark"
+      >
+        <option value="" disabled>
+          Bairro
+        </option>
+
+        {Object.keys(DELIVERY_FEES)
+          .sort((a, b) => a.localeCompare(b))
+          .map((bairro) => (
+            <option key={bairro} value={bairro}>
+              {bairro.replace(/\b\w/g, (l) => l.toUpperCase())}
+            </option>
+          ))}
+      </select>
+    </div>
+  </div>
+)}
 
         {/* PAGAMENTO (Usa os ícones QRCODE, CREDITCARD e BANKNOTE) */}
         <section className="bg-white p-8 rounded-[2.5rem] shadow-premium border border-brand-dark/5 space-y-6">
