@@ -49,54 +49,59 @@ export const MENU_ITEMS: Product[] = [
 ];
 
 export const DELIVERY_FEES: DeliveryFeeMap = {
-  // Taxas Baixas
-  "centro": 7,
+  // R$8 (Centro / Próximos)
+  "centro": 8,
+  "centro comercial": 8,
   "goes calmon": 8,
+  "zildolandia": 8,
   "pontalzinho": 8,
-  "mangabinha": 8,
-  "conceicao": 8,
   "castalia": 8,
-  "sao lourenco": 8,
-  
-  // Taxas Médias
-  "banco raso": 9,
-  "sao jose": 9,
-  "sarinha alcantara": 12,
-  "fatima": 10,
+  "conceicao": 8,
+  "nossa senhora da conceicao": 8,
+
+  // R$10 (Distância média) 
+  "banco raso": 10,
   "santo antonio": 10,
-  "sao pedro": 10,
-  "gloria": 10,
+  "mangabinha": 10,
+  "sarinha alcantara": 10,
   "jardim primavera": 10,
-  "santa ines": 12,
-  "sao judas": 10,
+  "jardim grapiuna": 10,
+  "fonseca": 10,
+  "nova itabuna": 10,
+  "sao caetano": 10,
+  "vila das dores": 10,
+  "fernando gomes": 10,
+  "ipiranga": 10,
+  "nossa senhora das gracas": 10,
 
-  // Taxas Altas
+  // R$12 (Mais afastados)
   "california": 12,
+  "nova california": 12,
+  "fatima": 12,
   "joao soares": 12,
-  "sao roque": 12,
-  "sao caetano": 12,
-  "novo sao caetano": 12,
-  "monte libano": 12,
-  "lomanto": 12,
+  "pedro geronimo": 12,
+  "daniel gomes": 12,
+  "maria pinheiro": 12,
   "monte cristo": 12,
-  "jardim vitoria": 12,
-  "santana": 12, 
-  "odilon": 12,
-  "parque boa vista": 12,
-  "jacana": 13,
-  "jaçana": 13,
-  "pedro geronimo": 13,
-  "fonseca": 13,
-  "vila zanor": 13,
+  "lomanto junior": 12,
+  "jorge amado": 12,
+  "sao judas tadeu": 12,
+  "sao pedro": 12,
+  "sao roque": 12,
+  "novo sao caetano": 12,
+  "taveirolandia": 12,
+  "parque santa clara": 12,
+  "parque verde": 12,
+  "novo horizonte": 12,
+  "paraíso": 12,
 
-  // Taxas Distantes
+  // R$15 (Distantes / Extremidades) 
   "ferradas": 15,
-  "salobrinho": 15,
-  "vila esperanca": 15,
-  "nova itabuna": 15,
-  "maria pinheiro": 15,
-  "mutira": 15,
-  "vale do sol": 15,
-  "novo horizonte": 15,
-  "santa clara": 15
+  "nova ferradas": 15,
+  "manoel leao": 15,
+  "parque boa vista": 15,
+  "santa ines": 15,
+  "sinval palmeira": 15,
+  "urbis iv": 15,
+  "area rural de itabuna": 15
 };
