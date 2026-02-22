@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { CartItem, CustomerData, PaymentMethod } from '../types';
 import { formatCurrency, generateWhatsAppMessage, getDeliveryFee } from '../utils';
-import { DELIVERY_FEES } from '../constants'; 
+import { DELIVERY_FEES } from '../constants';
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -104,6 +104,9 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
             <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Seu Nome Completo" 
               className="w-full pl-14 pr-6 py-5 rounded-2xl bg-brand-dark/5 border-none outline-none font-bold text-brand-dark focus:ring-2 focus:ring-brand-orange/20 transition-all" />
           </div>
+          </section>
+
+
 
 {/* ENDEREÇO */}
 {formData.deliveryType === 'delivery' && (
@@ -142,9 +145,9 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, subtotal, isStoreOpen, storeC
         }
         className="px-6 py-4 rounded-xl bg-brand-dark/5 outline-none font-bold text-brand-dark"
       >
-        <option value="" disabled>
-          Bairro
-        </option>
+
+<option value="">Selecione o bairro</option>
+
 
         {Object.keys(DELIVERY_FEES)
           .sort((a, b) => a.localeCompare(b))
