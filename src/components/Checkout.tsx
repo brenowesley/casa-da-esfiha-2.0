@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { CartItem, CustomerData, PaymentMethod } from '../types';
 import { formatCurrency, generateWhatsAppMessage, getDeliveryFee } from '../utils';
-import { DELIVERY_FEES } from '../utils/deliveryFees';
+import { DELIVERY_FEES } from '../constants'; 
 
 interface CheckoutProps {
   cart: CartItem[];
